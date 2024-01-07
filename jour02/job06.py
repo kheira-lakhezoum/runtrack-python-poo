@@ -1,4 +1,5 @@
 class Commande:
+    
     def __init__(self, numCommande):
         self.__numCommande = numCommande
         self.__platsCommandes = {} 

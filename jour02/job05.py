@@ -1,4 +1,5 @@
 class Voiture:
+    
     def __init__(self, marque, modele, annee, kilometrage):
         self.__marque = marque
         self.__modele = modele
