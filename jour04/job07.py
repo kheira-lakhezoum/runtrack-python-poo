@@ -1,21 +1,71 @@
+import random
 
+class Carte:
+    def __init__(self, valeur, couleur):
+        self.valeur = valeur
+        self.couleur = couleur
 
-# Développer votre version du célèbre jeu Blackjack. Le but est de faire le plus de points
-# sans dépasser 21. Chaque carte représente une valeur :
-# - de 2 à 10 : ces cartes ont pour valeur sa valeur nominale
-# - une figure a pour valeur 10 points
-# - un as 1 ou 11 points au choix
+    def __str__(self):
+        return f"{self.valeur} de {self.couleur}"
 
-# Le jeu commence avec les joueurs qui reçoivent chacun 2 cartes. Ensuite, le joueur peut
-# choisir de "prendre" (recevoir) une ou plusieurs cartes supplémentaires pour tenter
-# d'améliorer sa main, ou de "passer" et laisser le tour au croupier. 
+class Jeu:
+    def __init__(self):
+        valeurs = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+        couleurs = ['Coeur', 'Carreau', 'Trèfle', 'Pique']
+        self.paquet = [Carte(valeur, couleur) for valeur in valeurs for couleur in couleurs]
+        random.shuffle(self.paquet)
 
-# Le croupier prend des cartes jusqu'à ce qu'il ait au moins 17 points, puis s'arrête. Si la main du joueur dépasse
-# 21, il perd immédiatement. Si le total de la main du joueur est supérieur à celui du
-# croupier, le joueur gagne. Sinon, c'est le croupier qui gagne.
-# Créer au minimum deux classes Carte et Jeu.
-# La classe Carte aura au minimum un attribut valeur et couleur. La classe Jeu quant à
-# elle devra gérer l’ensemble des cartes. Les cartes du jeu seront stockées dans un
-# attribut paquet représenté par une liste et contenant 52 cartes.
-# Créer toutes les méthodes nécessaires pour jouer une partie.
+    def calculer_points(self, main):
+        points = 0
+        as_count = 0
 
+        for carte in main:
+            if carte.valeur.isdigit():
+                points += int(carte.valeur)
+            elif carte.valeur in ['J', 'Q', 'K']:
+                points += 10
+            elif carte.valeur == 'A':
+                as_count += 1
+
+        for i in range(as_count):
+            if points + 11 <= 21:
+                points += 11
+            else:
+                points += 1
+
+        return points
+
+    def jouer(self):
+        main_joueur = [self.paquet.pop(), self.paquet.pop()]
+        main_croupier = [self.paquet.pop(), self.paquet.pop()]
+
+        while True:
+            print(f"\nMain du joueur : {[str(carte) for carte in main_joueur]} - Points : {self.calculer_points(main_joueur)}")
+            print(f"Carte du croupier : {str(main_croupier[0])}")
+
+            choix = input("Voulez-vous prendre une carte (A) ou passer (P) ? ").upper()
+
+            if choix == 'P':
+                main_joueur.append(self.paquet.pop())
+                if self.calculer_points(main_joueur) > 21:
+                    print(f"\nMain du joueur : {[str(carte) for carte in main_joueur]} - Points : {self.calculer_points(main_joueur)}")
+                    print("Vous avez dépassé 21. Vous avez perdu!")
+                    return
+            elif choix == 'P':
+                break
+
+        while self.calculer_points(main_croupier) < 17:
+            main_croupier.append(self.paquet.pop())
+
+        print(f"\nMain du joueur : {[str(carte) for carte in main_joueur]} - Points : {self.calculer_points(main_joueur)}")
+        print(f"Main du croupier : {[str(carte) for carte in main_croupier]} - Points : {self.calculer_points(main_croupier)}")
+
+        if self.calculer_points(main_joueur) > self.calculer_points(main_croupier) and self.calculer_points(main_joueur) <= 21:
+            print("Vous avez gagné!")
+        elif self.calculer_points(main_croupier) <= 21:
+            print("Le croupier a gagné!")
+        else:
+            print("Le croupier a dépassé 21. Vous avez gagné!")
+
+jeu_blackjack = Jeu()
+jeu_blackjack.jouer()
